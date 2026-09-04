@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.LevelUp" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Main colors -->
+        <item name="android:windowBackground">@color/levelup_background</item>
+
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/levelup_background</item>
+        <item name="android:navigationBarColor">@color/levelup_background</item>
+
+        <!-- Light status bar icons OFF -->
+        <item name="android:windowLightStatusBar">false</item>
+
+
+        <!-- Material colors -->
+        <item name="colorPrimary">@color/levelup_primary</item>
+        <item name="colorSecondary">@color/levelup_cyan</item>
+        <item name="colorSurface">@color/levelup_surface</item>
+
+    </style>
+
+    <style name="Theme.LevelUp" parent="Base.Theme.LevelUp" />
+
+</resources>

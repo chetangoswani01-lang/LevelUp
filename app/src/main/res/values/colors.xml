@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- LevelUp Background -->
+    <color name="levelup_background">#0F172A</color>
+    <color name="levelup_surface">#1E293B</color>
+    <color name="levelup_surface_light">#334155</color>
+
+    <!-- LevelUp Brand Colors -->
+    <color name="levelup_primary">#7C3AED</color>
+    <color name="levelup_primary_dark">#6D28D9</color>
+    <color name="levelup_cyan">#06B6D4</color>
+
+    <!-- XP & Rewards -->
+    <color name="levelup_xp">#F59E0B</color>
+
+    <!-- Status Colors -->
+    <color name="levelup_success">#22C55E</color>
+    <color name="levelup_error">#EF4444</color>
+
+    <!-- Text -->
+    <color name="levelup_text_primary">#F8FAFC</color>
+    <color name="levelup_text_secondary">#94A3B8</color>
+
+    <!-- Basic -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+</resources>

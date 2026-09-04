@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">LevelUp</string>
+
+    <string name="welcome_message">Good Morning</string>
+    <string name="welcome_subtitle">Ready to level up today?</string>
+
+    <string name="level_5">LEVEL 5</string>
+    <string name="xp_progress">420 / 500 XP</string>
+    <string name="xp_until_level">80 XP until Level 6</string>
+
+    <string name="seven_day_streak">7 Day Streak</string>
+    <string name="keep_going">Keep going!</string>
+
+    <string name="todays_quests">Todays Quests</string>
+    <string name="study_quest">Study for 30 minutes - +20 XP</string>
+    <string name="exercise_quest">Exercise - +30 XP</string>
+
+</resources>
