@@ -10,7 +10,7 @@
     android:background="@color/levelup_background"
     tools:context=".HomeFragment">
 
-    <!-- Welcome message -->
+    <!-- HEADER -->
 
     <TextView
         android:id="@+id/tvWelcome"
@@ -20,14 +20,12 @@
         android:layout_marginTop="28dp"
         android:layout_marginEnd="24dp"
         android:text="@string/welcome_message"
-        android:textColor="@color/levelup_text_primary"
+        android:textColor="@color/levelup_cyan"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Subtitle -->
 
     <TextView
         android:id="@+id/tvSubtitle"
@@ -36,22 +34,22 @@
         android:layout_marginTop="6dp"
         android:text="@string/welcome_subtitle"
         android:textColor="@color/levelup_text_secondary"
-        android:textSize="15sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="@id/tvWelcome"
         app:layout_constraintStart_toStartOf="@id/tvWelcome"
         app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
 
-    <!-- Level Card -->
+    <!-- LEVEL CARD -->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardLevel"
         android:layout_width="0dp"
         android:layout_height="190dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="22dp"
         android:layout_marginEnd="24dp"
-        app:cardBackgroundColor="@color/levelup_surface"
-        app:cardCornerRadius="24dp"
+        app:cardBackgroundColor="@color/system_panel"
+        app:cardCornerRadius="22dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,8 +64,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/level_5"
-                android:textColor="@color/levelup_primary"
+                android:text="SYSTEM STATUS"
+                android:textColor="@color/levelup_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+
+            <TextView
+                android:id="@+id/tvLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/levelup_cyan"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -75,8 +83,7 @@
                 android:id="@+id/tvXpProgress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/xp_progress"
+                android:layout_marginTop="5dp"
                 android:textColor="@color/levelup_text_primary"
                 android:textSize="28sp"
                 android:textStyle="bold" />
@@ -85,32 +92,31 @@
                 android:id="@+id/xpProgressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_marginTop="18dp"
-                android:max="500"
-                android:progress="420"
+                android:layout_height="9dp"
+                android:layout_marginTop="17dp"
+                android:max="100"
                 android:progressTint="@color/levelup_primary" />
 
             <TextView
+                android:id="@+id/tvXpUntilLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/xp_until_level"
-                android:textColor="@color/levelup_text_secondary"
+                android:layout_marginTop="9dp"
+                android:textColor="@color/levelup_cyan"
                 android:textSize="13sp" />
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Streak Card -->
+    <!-- STREAK CARD -->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardStreak"
         android:layout_width="0dp"
-        android:layout_height="90dp"
+        android:layout_height="88dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="24dp"
         app:cardBackgroundColor="@color/levelup_surface"
         app:cardCornerRadius="20dp"
@@ -161,24 +167,24 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Today's Quests -->
+    <!-- QUEST TITLE -->
 
     <TextView
         android:id="@+id/tvQuests"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="22dp"
         android:layout_marginEnd="24dp"
-        android:text="@string/todays_quests"
-        android:textColor="@color/levelup_text_primary"
-        android:textSize="21sp"
+        android:text="DAILY QUESTS"
+        android:textColor="@color/levelup_cyan"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardStreak" />
 
-    <!-- Study Quest -->
+    <!-- QUEST 1 -->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardQuest1"
@@ -226,7 +232,7 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Exercise Quest -->
+    <!-- QUEST 2 -->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardQuest2"
@@ -273,5 +279,67 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <!-- QUEST 3 -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardQuest3"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        app:cardBackgroundColor="@color/levelup_surface"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardQuest2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp">
+
+            <TextView
+                android:id="@+id/tvQuest3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Read for 30 minutes"
+                android:textColor="@color/levelup_text_primary"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tvQuest3Xp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+30 XP"
+                android:textColor="@color/levelup_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btnAddQuest"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:text="+  ADD QUEST"
+        android:textColor="@color/levelup_text_primary"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/levelup_primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardQuest3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
