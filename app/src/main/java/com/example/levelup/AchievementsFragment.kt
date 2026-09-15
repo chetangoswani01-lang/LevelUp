@@ -27,61 +27,108 @@ class AchievementsFragment : Fragment() {
         savedInstanceState: Bundle?
     ) {
 
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
-        val context = requireContext()
+        updateAchievements(view)
+    }
 
-        val achievement1 =
-            view.findViewById<TextView>(R.id.tvAchievement1)
+    private fun updateAchievements(
+        view: View
+    ) {
 
-        val achievement2 =
-            view.findViewById<TextView>(R.id.tvAchievement2)
+        val context =
+            requireContext()
 
-        val achievement3 =
-            view.findViewById<TextView>(R.id.tvAchievement3)
-
-        val achievement4 =
-            view.findViewById<TextView>(R.id.tvAchievement4)
+        val level =
+            LevelUpData.getLevel(
+                context
+            )
 
         val xp =
-            LevelUpData.getXp(context)
-
-        val completedQuests =
-            LevelUpData.getCompletedQuestCount(context)
+            LevelUpData.getXp(
+                context
+            )
 
         val streak =
-            LevelUpData.getStreak(context)
+            LevelUpData.getStreak(
+                context
+            )
 
-        if (completedQuests >= 1) {
-            achievement1.text =
-                "🏆 First Steps\n✓ Unlocked - Complete your first quest"
-        } else {
-            achievement1.text =
-                "🏆 First Steps\n🔒 Complete your first quest"
-        }
+        val completed =
+            LevelUpData.getCompletedQuestCount(
+                context
+            )
 
-        if (streak >= 7) {
-            achievement2.text =
-                "🔥 7 Day Streak\n✓ Unlocked - Maintain a 7-day streak"
-        } else {
-            achievement2.text =
-                "🔥 7 Day Streak\n🔒 Reach a 7-day streak"
-        }
+        val firstStep =
+            view.findViewById<TextView>(
+                R.id.tvAchievementFirst
+            )
 
-        if (xp >= 500) {
-            achievement3.text =
-                "⭐ Level Up\n✓ Unlocked - Reach Level 6"
-        } else {
-            achievement3.text =
-                "⭐ Level Up\n🔒 ${500 - xp} XP remaining to reach Level 6"
-        }
+        val levelFive =
+            view.findViewById<TextView>(
+                R.id.tvAchievementFive
+            )
 
-        if (completedQuests >= 3) {
-            achievement4.text =
-                "🎯 Quest Master\n✓ Unlocked - Complete 3 quests"
-        } else {
-            achievement4.text =
-                "🎯 Quest Master\n🔒 Complete 3 quests"
+        val levelTen =
+            view.findViewById<TextView>(
+                R.id.tvAchievementTen
+            )
+
+        val weekWarrior =
+            view.findViewById<TextView>(
+                R.id.tvAchievementWeek
+            )
+
+        val xpMaster =
+            view.findViewById<TextView>(
+                R.id.tvAchievementXp
+            )
+
+        firstStep.text =
+            if (xp > 0) {
+                "🔓  FIRST STEP\nEarned your first XP"
+            } else {
+                "🔒  FIRST STEP\nEarn your first XP"
+            }
+
+        levelFive.text =
+            if (level >= 5) {
+                "🔓  LEVEL 5\nReached Level 5"
+            } else {
+                "🔒  LEVEL 5\nReach Level 5"
+            }
+
+        levelTen.text =
+            if (level >= 10) {
+                "🔓  LEVEL 10\nReached Level 10"
+            } else {
+                "🔒  LEVEL 10\nReach Level 10"
+            }
+
+        weekWarrior.text =
+            if (streak >= 7) {
+                "🔓  WEEK WARRIOR\nReached a 7 day streak"
+            } else {
+                "🔒  WEEK WARRIOR\nReach a 7 day streak"
+            }
+
+        xpMaster.text =
+            if (xp >= 1000) {
+                "🔓  XP MASTER\nEarned 1000 XP"
+            } else {
+                "🔒  XP MASTER\nEarn 1000 XP"
+            }
+    }
+
+    override fun onResume() {
+
+        super.onResume()
+
+        view?.let {
+            updateAchievements(it)
         }
     }
 }

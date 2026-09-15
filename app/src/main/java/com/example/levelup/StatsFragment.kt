@@ -27,58 +27,88 @@ class StatsFragment : Fragment() {
         savedInstanceState: Bundle?
     ) {
 
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
-        val context = requireContext()
+        updateStats(view)
+    }
 
-        val currentLevel =
-            view.findViewById<TextView>(R.id.tvCurrentLevel)
+    private fun updateStats(
+        view: View
+    ) {
 
-        val totalXp =
-            view.findViewById<TextView>(R.id.tvTotalXp)
-
-        val levelProgress =
-            view.findViewById<TextView>(R.id.tvLevelProgress)
-
-        val streak =
-            view.findViewById<TextView>(R.id.tvStreak)
-
-        val quests =
-            view.findViewById<TextView>(R.id.tvQuests)
-
-        val xp = LevelUpData.getXp(context)
+        val context =
+            requireContext()
 
         val level =
-            LevelUpData.getLevel(context)
+            LevelUpData.getLevel(
+                context
+            )
 
-        val currentLevelXp =
-            LevelUpData.getCurrentLevelXp(context)
+        val totalXp =
+            LevelUpData.getXp(
+                context
+            )
 
-        val xpPerLevel =
-            LevelUpData.getXpPerLevel()
+        val currentXp =
+            LevelUpData.getCurrentLevelXp(
+                context
+            )
 
-        val xpToNext =
-            LevelUpData.getXpToNextLevel(context)
+        val streak =
+            LevelUpData.getStreak(
+                context
+            )
 
-        val currentStreak =
-            LevelUpData.getStreak(context)
+        val completed =
+            LevelUpData.getCompletedQuestCount(
+                context
+            )
 
-        val completedQuests =
-            LevelUpData.getCompletedQuestCount(context)
+        val customQuests =
+            LevelUpData.getCustomQuests(
+                context
+            ).size
 
-        currentLevel.text =
-            "⭐ Current Level\nLevel $level"
+        view.findViewById<TextView>(
+            R.id.tvStatsLevel
+        ).text =
+            "Current Level: $level"
 
-        totalXp.text =
-            "💎 Total XP\n$xp XP"
+        view.findViewById<TextView>(
+            R.id.tvStatsTotalXp
+        ).text =
+            "Total XP: $totalXp"
 
-        levelProgress.text =
-            "▣ Level Progress\n$currentLevelXp / $xpPerLevel XP\n\n$xpToNext XP until Level ${level + 1}"
+        view.findViewById<TextView>(
+            R.id.tvStatsCurrentXp
+        ).text =
+            "XP This Level: $currentXp / 100"
 
-        streak.text =
-            "🔥 Current Streak\n$currentStreak Days"
+        view.findViewById<TextView>(
+            R.id.tvStatsStreak
+        ).text =
+            "Current Streak: $streak days"
 
-        quests.text =
-            "🎯 Quests Completed\n$completedQuests"
+        view.findViewById<TextView>(
+            R.id.tvStatsCustom
+        ).text =
+            "Custom Quests: $customQuests"
+
+        view.findViewById<TextView>(
+            R.id.tvStatsCompleted
+        ).text =
+            "Completed Quests: $completed"
+    }
+
+    override fun onResume() {
+
+        super.onResume()
+
+        view?.let {
+            updateStats(it)
+        }
     }
 }

@@ -27,35 +27,58 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ) {
 
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
-        val context = requireContext()
+        updateProfile(view)
+    }
 
-        val userName =
-            view.findViewById<TextView>(R.id.tvUserName)
+    private fun updateProfile(
+        view: View
+    ) {
 
-        val xpText =
-            view.findViewById<TextView>(R.id.tvProfileXp)
-
-        val streakText =
-            view.findViewById<TextView>(R.id.tvProfileStreak)
-
-        val xp =
-            LevelUpData.getXp(context)
-
-        val streak =
-            LevelUpData.getStreak(context)
+        val context =
+            requireContext()
 
         val level =
-            LevelUpData.getLevel(context)
+            LevelUpData.getLevel(
+                context
+            )
 
-        userName.text =
-            "PLAYER\nLEVEL $level"
+        val xp =
+            LevelUpData.getXp(
+                context
+            )
 
-        xpText.text =
-            "💎 Total XP\n$xp XP"
+        val streak =
+            LevelUpData.getStreak(
+                context
+            )
 
-        streakText.text =
-            "🔥 Current Streak\n$streak Days"
+        view.findViewById<TextView>(
+            R.id.tvProfileLevel
+        ).text =
+            "Level: $level"
+
+        view.findViewById<TextView>(
+            R.id.tvProfileXp
+        ).text =
+            "Total XP: $xp"
+
+        view.findViewById<TextView>(
+            R.id.tvProfileStreak
+        ).text =
+            "Streak: $streak days"
+    }
+
+    override fun onResume() {
+
+        super.onResume()
+
+        view?.let {
+            updateProfile(it)
+        }
     }
 }

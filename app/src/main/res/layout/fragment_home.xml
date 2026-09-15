@@ -10,205 +10,155 @@
     android:background="@color/levelup_background"
     tools:context=".HomeFragment">
 
-
-    <!-- ===================================================== -->
-    <!-- HEADER -->
-    <!-- ===================================================== -->
-
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/welcome_message"
-        android:textColor="@color/levelup_cyan"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="@string/welcome_subtitle"
-        android:textColor="@color/levelup_text_secondary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@id/tvWelcome"
-        app:layout_constraintStart_toStartOf="@id/tvWelcome"
-        app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
-
-
-    <!-- ===================================================== -->
-    <!-- MAIN SCROLL AREA -->
-    <!-- ===================================================== -->
-
     <ScrollView
-        android:id="@+id/homeScrollView"
+        android:id="@+id/homeScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
         android:fillViewport="true"
         android:scrollbars="none"
-        app:layout_constraintBottom_toTopOf="@id/btnAddQuest"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
-
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="20dp">
+            android:paddingStart="20dp"
+            android:paddingTop="18dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="25dp">
 
+            <TextView
+                android:id="@+id/tvWelcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Good Morning"
+                android:textColor="@color/levelup_cyan"
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
-            <!-- ================================================= -->
-            <!-- LEVEL CARD -->
-            <!-- ================================================= -->
+            <TextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Ready to level up today?"
+                android:textColor="@color/levelup_text_secondary"
+                android:textSize="15sp" />
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLevel"
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
-                app:cardBackgroundColor="@color/system_panel"
-                app:cardCornerRadius="22dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="@color/levelup_surface"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="22dp">
-
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:letterSpacing="0.08"
                         android:text="SYSTEM STATUS"
                         android:textColor="@color/levelup_text_secondary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
-
-                    <TextView
-                        android:id="@+id/tvLevel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@color/levelup_cyan"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-
-                    <TextView
-                        android:id="@+id/tvXpProgress"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:textColor="@color/levelup_text_primary"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
+                        <TextView
+                            android:id="@+id/tvLevel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="LEVEL 0"
+                            android:textColor="@color/levelup_cyan"
+                            android:textSize="27sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvXpProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 100 XP"
+                            android:textColor="@color/levelup_text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                     <ProgressBar
                         android:id="@+id/xpProgressBar"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
-                        android:layout_height="9dp"
-                        android:layout_marginTop="17dp"
+                        android:layout_height="10dp"
+                        android:layout_marginTop="12dp"
                         android:max="100"
-                        android:progressTint="@color/levelup_primary" />
-
+                        android:progress="0"
+                        android:progressTint="@color/levelup_cyan"
+                        android:backgroundTint="@color/system_panel" />
 
                     <TextView
                         android:id="@+id/tvXpUntilLevel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
-                        android:textColor="@color/levelup_cyan"
+                        android:layout_marginTop="8dp"
+                        android:text="100 XP until Level 1"
+                        android:textColor="@color/levelup_text_secondary"
                         android:textSize="13sp" />
-
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
-
-            <!-- ================================================= -->
-            <!-- STREAK CARD -->
-            <!-- ================================================= -->
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardStreak"
                 android:layout_width="match_parent"
-                android:layout_height="88dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 app:cardBackgroundColor="@color/levelup_surface"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp">
-
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvStreak"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🔥"
-                        android:textSize="30sp" />
+                        android:text="🔥 0 Day Streak"
+                        android:textColor="@color/levelup_text_primary"
+                        android:textSize="21sp"
+                        android:textStyle="bold" />
 
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/tvStreakSubtitle"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:orientation="vertical">
-
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/seven_day_streak"
-                            android:textColor="@color/levelup_text_primary"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="@string/keep_going"
-                            android:textColor="@color/levelup_text_secondary"
-                            android:textSize="13sp" />
-
-
-                    </LinearLayout>
+                        android:layout_marginTop="4dp"
+                        android:text="Keep going!"
+                        android:textColor="@color/levelup_text_secondary"
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
-
-
-            <!-- ================================================= -->
-            <!-- QUEST TITLE -->
-            <!-- ================================================= -->
 
             <TextView
                 android:id="@+id/tvQuests"
@@ -220,50 +170,26 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-
-            <!-- ================================================= -->
-            <!-- DYNAMIC QUEST CONTAINER -->
-            <!-- ================================================= -->
-
             <LinearLayout
                 android:id="@+id/questContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:orientation="vertical" />
 
-
-            <!-- Bottom spacing -->
-
-            <Space
+            <Button
+                android:id="@+id/btnAddQuest"
                 android:layout_width="match_parent"
-                android:layout_height="20dp" />
-
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/levelup_cyan"
+                android:text="+ ADD QUEST"
+                android:textColor="@color/levelup_background"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
     </ScrollView>
-
-
-    <!-- ===================================================== -->
-    <!-- ADD QUEST BUTTON -->
-    <!-- ===================================================== -->
-
-    <Button
-        android:id="@+id/btnAddQuest"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="@color/levelup_primary"
-        android:text="+  ADD QUEST"
-        android:textColor="@color/levelup_text_primary"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

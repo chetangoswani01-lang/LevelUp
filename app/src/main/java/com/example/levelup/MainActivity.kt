@@ -14,14 +14,13 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        bottomNavigation = findViewById(R.id.bottomNavigation)
+        bottomNavigation =
+            findViewById(R.id.bottomNavigation)
 
-        // Open Home screen when the app starts
         if (savedInstanceState == null) {
             openFragment(HomeFragment())
         }
 
-        // Bottom navigation
         bottomNavigation.setOnItemSelectedListener { item ->
 
             when (item.itemId) {
@@ -50,15 +49,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Select Home initially
-        bottomNavigation.selectedItemId = R.id.nav_home
+        bottomNavigation.selectedItemId =
+            R.id.nav_home
     }
 
-    private fun openFragment(fragment: Fragment) {
+    private fun openFragment(
+        fragment: Fragment
+    ) {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
+            .replace(
+                R.id.fragmentContainer,
+                fragment
+            )
             .commit()
     }
 }

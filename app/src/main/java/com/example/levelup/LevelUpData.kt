@@ -3,80 +3,45 @@ package com.example.levelup
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object LevelUpData {
 
     private const val PREFS_NAME = "levelup_data"
 
-    // =========================================================
-    // GENERAL DATA
-    // =========================================================
-
     private const val KEY_XP = "current_xp"
     private const val KEY_STREAK = "streak"
+    private const val KEY_LAST_ACTIVITY_DAY = "last_activity_day"
+    private const val KEY_LAST_DAY = "last_day"
+    private const val KEY_DECAY_APPLIED = "decay_applied"
+    private const val KEY_SYSTEM_VERSION = "system_version"
 
-    private const val DEFAULT_XP = 420
-    private const val DEFAULT_STREAK = 7
+    private const val KEY_STUDY_COMPLETED = "study_completed"
+    private const val KEY_EXERCISE_COMPLETED = "exercise_completed"
+    private const val KEY_READING_COMPLETED = "reading_completed"
+
+    private const val KEY_STUDY_START_TIME = "study_start_time"
+    private const val KEY_EXERCISE_START_TIME = "exercise_start_time"
+    private const val KEY_READING_START_TIME = "reading_start_time"
+
+    private const val KEY_CUSTOM_QUESTS = "custom_quests"
+
+    private const val SYSTEM_VERSION = 2
+    private const val DEFAULT_XP = 0
+    private const val DEFAULT_STREAK = 0
     private const val XP_PER_LEVEL = 100
 
-
-    // =========================================================
-    // DEFAULT QUEST DATA
-    // =========================================================
-
-    private const val KEY_STUDY_COMPLETED =
-        "study_completed"
-
-    private const val KEY_EXERCISE_COMPLETED =
-        "exercise_completed"
-
-    private const val KEY_READING_COMPLETED =
-        "reading_completed"
-
-
-    private const val KEY_STUDY_START_TIME =
-        "study_start_time"
-
-    private const val KEY_EXERCISE_START_TIME =
-        "exercise_start_time"
-
-    private const val KEY_READING_START_TIME =
-        "reading_start_time"
-
-
-    // =========================================================
-    // CUSTOM QUEST DATA
-    // =========================================================
-
-    private const val KEY_CUSTOM_QUESTS =
-        "custom_quests"
-
-
-    // =========================================================
-    // QUEST DATA CLASS
-    // =========================================================
-
     data class Quest(
-
         val id: Long,
-
         val name: String,
-
         val targetMinutes: Int,
-
         val baseXp: Int,
-
         val difficulty: String,
-
         val completed: Boolean = false,
-
         val startTime: Long = 0L
     )
-
-
-    // =========================================================
-    // SHARED PREFERENCES
-    // =========================================================
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(
@@ -84,31 +49,523 @@ object LevelUpData {
             Context.MODE_PRIVATE
         )
 
+    private fun today(): String {
+        return SimpleDateFormat(
+            "yyyyMMdd",
+            Locale.US
+        ).format(Date())
+    }
 
-    // =========================================================
-    // XP SYSTEM
-    // =========================================================
+    private fun daysBetween(
+        from: String,
+        to: String
+    ): Int {
 
-    fun getXp(context: Context): Int {
+        if (from.isEmpty()) {
+            return 0
+        }
 
-        return prefs(context).getInt(
-            KEY_XP,
-            DEFAULT_XP
+        val format =
+            SimpleDateFormat(
+                "yyyyMMdd",
+                Locale.US
+            )
+
+        return try {
+
+            val start =
+                format.parse(from)
+                    ?: return 0
+
+            val end =
+                format.parse(to)
+                    ?: return 0
+
+            (
+                    (end.time - start.time) /
+                            (24L * 60L * 60L * 1000L)
+                    ).toInt()
+
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    private fun readCustomQuests(
+        context: Context
+    ): MutableList<Quest> {
+
+        val quests =
+            mutableListOf<Quest>()
+
+        val json =
+            prefs(context).getString(
+                KEY_CUSTOM_QUESTS,
+                "[]"
+            ) ?: "[]"
+
+        try {
+
+            val array =
+                JSONArray(json)
+
+            for (i in 0 until array.length()) {
+
+                val item =
+                    array.getJSONObject(i)
+
+                quests.add(
+                    Quest(
+                        id =
+                            item.optLong(
+                                "id"
+                            ),
+
+                        name =
+                            item.optString(
+                                "name"
+                            ),
+
+                        targetMinutes =
+                            item.optInt(
+                                "targetMinutes"
+                            ),
+
+                        baseXp =
+                            item.optInt(
+                                "baseXp"
+                            ),
+
+                        difficulty =
+                            item.optString(
+                                "difficulty",
+                                "Medium"
+                            ),
+
+                        completed =
+                            item.optBoolean(
+                                "completed",
+                                false
+                            ),
+
+                        startTime =
+                            item.optLong(
+                                "startTime",
+                                0L
+                            )
+                    )
+                )
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return quests
+    }
+
+    private fun saveCustomQuests(
+        context: Context,
+        quests: List<Quest>
+    ) {
+
+        val array =
+            JSONArray()
+
+        for (quest in quests) {
+
+            val item =
+                JSONObject()
+
+            item.put(
+                "id",
+                quest.id
+            )
+
+            item.put(
+                "name",
+                quest.name
+            )
+
+            item.put(
+                "targetMinutes",
+                quest.targetMinutes
+            )
+
+            item.put(
+                "baseXp",
+                quest.baseXp
+            )
+
+            item.put(
+                "difficulty",
+                quest.difficulty
+            )
+
+            item.put(
+                "completed",
+                quest.completed
+            )
+
+            item.put(
+                "startTime",
+                quest.startTime
+            )
+
+            array.put(
+                item
+            )
+        }
+
+        prefs(context)
+            .edit()
+            .putString(
+                KEY_CUSTOM_QUESTS,
+                array.toString()
+            )
+            .apply()
+    }
+
+    private fun resetDailyQuests(
+        context: Context
+    ) {
+
+        prefs(context)
+            .edit()
+            .putBoolean(
+                KEY_STUDY_COMPLETED,
+                false
+            )
+            .putBoolean(
+                KEY_EXERCISE_COMPLETED,
+                false
+            )
+            .putBoolean(
+                KEY_READING_COMPLETED,
+                false
+            )
+            .remove(
+                KEY_STUDY_START_TIME
+            )
+            .remove(
+                KEY_EXERCISE_START_TIME
+            )
+            .remove(
+                KEY_READING_START_TIME
+            )
+            .apply()
+
+        val quests =
+            readCustomQuests(context)
+
+        val resetQuests =
+            quests.map {
+
+                it.copy(
+                    completed = false,
+                    startTime = 0L
+                )
+            }
+
+        saveCustomQuests(
+            context,
+            resetQuests
         )
     }
 
+    private fun ensureSystemState(
+        context: Context
+    ) {
+
+        val preferences =
+            prefs(context)
+
+        val currentVersion =
+            preferences.getInt(
+                KEY_SYSTEM_VERSION,
+                0
+            )
+
+        if (
+            currentVersion !=
+            SYSTEM_VERSION
+        ) {
+
+            preferences
+                .edit()
+                .putInt(
+                    KEY_SYSTEM_VERSION,
+                    SYSTEM_VERSION
+                )
+                .putInt(
+                    KEY_XP,
+                    0
+                )
+                .putInt(
+                    KEY_STREAK,
+                    0
+                )
+                .putString(
+                    KEY_LAST_ACTIVITY_DAY,
+                    ""
+                )
+                .putString(
+                    KEY_LAST_DAY,
+                    today()
+                )
+                .putInt(
+                    KEY_DECAY_APPLIED,
+                    0
+                )
+                .putBoolean(
+                    KEY_STUDY_COMPLETED,
+                    false
+                )
+                .putBoolean(
+                    KEY_EXERCISE_COMPLETED,
+                    false
+                )
+                .putBoolean(
+                    KEY_READING_COMPLETED,
+                    false
+                )
+                .remove(
+                    KEY_STUDY_START_TIME
+                )
+                .remove(
+                    KEY_EXERCISE_START_TIME
+                )
+                .remove(
+                    KEY_READING_START_TIME
+                )
+                .putString(
+                    KEY_CUSTOM_QUESTS,
+                    "[]"
+                )
+                .apply()
+
+            return
+        }
+
+        val currentDay =
+            today()
+
+        val lastDay =
+            preferences.getString(
+                KEY_LAST_DAY,
+                currentDay
+            ) ?: currentDay
+
+        if (
+            currentDay ==
+            lastDay
+        ) {
+            return
+        }
+
+        val lastActivity =
+            preferences.getString(
+                KEY_LAST_ACTIVITY_DAY,
+                ""
+            ) ?: ""
+
+        val missedDays =
+            if (
+                lastActivity.isEmpty()
+            ) {
+
+                0
+
+            } else {
+
+                (
+                        daysBetween(
+                            lastActivity,
+                            currentDay
+                        ) - 1
+                        ).coerceAtLeast(0)
+            }
+
+        val alreadyApplied =
+            preferences.getInt(
+                KEY_DECAY_APPLIED,
+                0
+            )
+
+        val newDecayDays =
+            (
+                    missedDays -
+                            alreadyApplied
+                    ).coerceAtLeast(0)
+
+        var xp =
+            preferences.getInt(
+                KEY_XP,
+                0
+            )
+
+        repeat(
+            newDecayDays
+        ) {
+
+            xp =
+                (
+                        xp * 0.95
+                        )
+                    .toInt()
+                    .coerceAtLeast(0)
+        }
+
+        val gap =
+            if (
+                lastActivity.isEmpty()
+            ) {
+
+                0
+
+            } else {
+
+                daysBetween(
+                    lastActivity,
+                    currentDay
+                )
+            }
+
+        val newStreak =
+            when {
+
+                gap <= 1 ->
+                    preferences.getInt(
+                        KEY_STREAK,
+                        0
+                    )
+
+                else ->
+                    0
+            }
+
+        preferences
+            .edit()
+            .putInt(
+                KEY_XP,
+                xp
+            )
+            .putInt(
+                KEY_STREAK,
+                newStreak
+            )
+            .putInt(
+                KEY_DECAY_APPLIED,
+                missedDays
+            )
+            .putString(
+                KEY_LAST_DAY,
+                currentDay
+            )
+            .apply()
+
+        resetDailyQuests(
+            context
+        )
+    }
+
+    private fun markActivity(
+        context: Context
+    ) {
+
+        ensureSystemState(
+            context
+        )
+
+        val currentDay =
+            today()
+
+        val preferences =
+            prefs(context)
+
+        val lastActivity =
+            preferences.getString(
+                KEY_LAST_ACTIVITY_DAY,
+                ""
+            ) ?: ""
+
+        val currentStreak =
+            preferences.getInt(
+                KEY_STREAK,
+                0
+            )
+
+        val newStreak =
+            when {
+
+                lastActivity ==
+                        currentDay ->
+                    currentStreak
+
+                lastActivity.isEmpty() ->
+                    1
+
+                daysBetween(
+                    lastActivity,
+                    currentDay
+                ) == 1 ->
+                    currentStreak + 1
+
+                else ->
+                    1
+            }
+
+        preferences
+            .edit()
+            .putString(
+                KEY_LAST_ACTIVITY_DAY,
+                currentDay
+            )
+            .putInt(
+                KEY_STREAK,
+                newStreak
+            )
+            .putInt(
+                KEY_DECAY_APPLIED,
+                0
+            )
+            .putString(
+                KEY_LAST_DAY,
+                currentDay
+            )
+            .apply()
+    }
+
+    fun getXp(
+        context: Context
+    ): Int {
+
+        ensureSystemState(
+            context
+        )
+
+        return prefs(context)
+            .getInt(
+                KEY_XP,
+                DEFAULT_XP
+            )
+            .coerceAtLeast(0)
+    }
 
     fun addXp(
         context: Context,
         amount: Int
     ) {
 
-        if (amount <= 0) {
+        if (
+            amount <= 0
+        ) {
             return
         }
 
         val newXp =
-            getXp(context) + amount
+            getXp(context) +
+                    amount
 
         prefs(context)
             .edit()
@@ -119,102 +576,86 @@ object LevelUpData {
             .apply()
     }
 
-
     fun getLevel(
         context: Context
     ): Int {
 
-        val totalXp =
-            getXp(context)
-
-        return (
-                totalXp /
-                        XP_PER_LEVEL
-                ) + 1
+        return getXp(context) /
+                XP_PER_LEVEL
     }
-
 
     fun getCurrentLevelXp(
         context: Context
     ): Int {
 
-        val totalXp =
-            getXp(context)
-
-        return totalXp %
+        return getXp(context) %
                 XP_PER_LEVEL
     }
-
 
     fun getXpToNextLevel(
         context: Context
     ): Int {
 
-        val currentLevelXp =
-            getCurrentLevelXp(context)
-
         return XP_PER_LEVEL -
-                currentLevelXp
+                getCurrentLevelXp(
+                    context
+                )
     }
-
 
     fun getXpPerLevel(): Int {
-
         return XP_PER_LEVEL
     }
-
-
-    // =========================================================
-    // AUTOMATIC BASE XP
-    // =========================================================
 
     fun calculateBaseXp(
         targetMinutes: Int,
         difficulty: String
     ): Int {
 
-        val safeMinutes =
+        val minutes =
             targetMinutes.coerceAtLeast(1)
-
-
-        val difficultyMultiplier =
-            when (difficulty.lowercase()) {
-
-                "easy" -> 1.0
-
-                "medium" -> 1.5
-
-                "hard" -> 2.0
-
-                else -> 1.5
-            }
-
 
         val timeXp =
             when {
 
-                safeMinutes <= 10 -> 10
+                minutes <= 10 ->
+                    10
 
-                safeMinutes <= 30 -> 20
+                minutes <= 30 ->
+                    20
 
-                safeMinutes <= 60 -> 30
+                minutes <= 60 ->
+                    30
 
-                safeMinutes <= 90 -> 40
+                minutes <= 90 ->
+                    40
 
-                else -> 50
+                else ->
+                    50
             }
 
+        val multiplier =
+            when (
+                difficulty.lowercase()
+            ) {
+
+                "easy" ->
+                    1.0
+
+                "medium" ->
+                    1.5
+
+                "hard" ->
+                    2.0
+
+                else ->
+                    1.5
+            }
 
         return (
                 timeXp *
-                        difficultyMultiplier
+                        multiplier
                 ).toInt()
     }
-
-
-    // =========================================================
-    // FINAL XP - SECONDS BASED
-    // =========================================================
 
     fun calculateFinalXp(
         baseXp: Int,
@@ -222,81 +663,62 @@ object LevelUpData {
         actualSeconds: Long
     ): Int {
 
-        if (baseXp <= 0) {
+        if (
+            baseXp <= 0
+        ) {
             return 0
         }
 
-
-        if (targetMinutes <= 0) {
+        if (
+            targetMinutes <= 0
+        ) {
             return baseXp
         }
 
-
-        if (actualSeconds <= 0L) {
+        if (
+            actualSeconds <= 0
+        ) {
             return baseXp
         }
-
 
         val targetSeconds =
             targetMinutes.toLong() *
                     60L
 
-
-        // -----------------------------------------------------
-        // If user takes target time or longer:
-        // No speed bonus.
-        // -----------------------------------------------------
-
-        if (actualSeconds >= targetSeconds) {
+        if (
+            actualSeconds >=
+            targetSeconds
+        ) {
             return baseXp
         }
 
-
-        // -----------------------------------------------------
-        // Calculate how much time was saved.
-        // -----------------------------------------------------
-
-        val timeSaved =
+        val saved =
             targetSeconds -
                     actualSeconds
 
-
-        val percentageSaved =
-            timeSaved.toDouble() /
+        val savedPercentage =
+            saved.toDouble() /
                     targetSeconds.toDouble()
 
-
-        // -----------------------------------------------------
-        // Maximum speed bonus = 50%
-        // -----------------------------------------------------
-
-        val bonusMultiplier =
+        val bonus =
             1.0 +
                     (
-                            percentageSaved *
+                            savedPercentage *
                                     0.5
                             )
 
-
-        val calculatedXp =
+        val result =
             (
                     baseXp *
-                            bonusMultiplier
+                            bonus
                     ).toInt()
 
-
-        return calculatedXp.coerceAtMost(
+        return result.coerceAtMost(
             (
-                    baseXp *
-                            1.5
+                    baseXp * 1.5
                     ).toInt()
         )
     }
-
-
-    // =========================================================
-    // BACKWARD-COMPATIBLE XP FUNCTION
-    // =========================================================
 
     fun calculateFinalXp(
         baseXp: Int,
@@ -305,116 +727,80 @@ object LevelUpData {
     ): Int {
 
         val safeMinutes =
-            actualMinutes.coerceAtLeast(1)
-
-
-        val actualSeconds =
-            safeMinutes.toLong() *
-                    60L
-
+            actualMinutes
+                .coerceAtLeast(1)
 
         return calculateFinalXp(
-            baseXp =
-                baseXp,
-
-            targetMinutes =
-                targetMinutes,
-
-            actualSeconds =
-                actualSeconds
+            baseXp,
+            targetMinutes,
+            safeMinutes.toLong() * 60L
         )
     }
-
-
-    // =========================================================
-    // DEFAULT QUESTS
-    // =========================================================
 
     fun getDefaultQuests(
         context: Context
     ): List<Quest> {
 
+        ensureSystemState(
+            context
+        )
+
         return listOf(
 
             Quest(
-
                 id = 1L,
-
-                name =
-                    "Study for 30 minutes",
-
+                name = "Study for 30 minutes",
                 targetMinutes = 30,
-
                 baseXp =
                     calculateBaseXp(
                         30,
                         "Medium"
                     ),
-
                 difficulty = "Medium",
-
                 completed =
                     isStudyCompleted(
                         context
                     ),
-
                 startTime =
                     getStudyStartTime(
                         context
                     )
             ),
 
-
             Quest(
-
                 id = 2L,
-
                 name = "Exercise",
-
                 targetMinutes = 30,
-
                 baseXp =
                     calculateBaseXp(
                         30,
                         "Hard"
                     ),
-
                 difficulty = "Hard",
-
                 completed =
                     isExerciseCompleted(
                         context
                     ),
-
                 startTime =
                     getExerciseStartTime(
                         context
                     )
             ),
 
-
             Quest(
-
                 id = 3L,
-
-                name =
-                    "Read for 30 minutes",
-
+                name = "Read for 30 minutes",
                 targetMinutes = 30,
-
                 baseXp =
                     calculateBaseXp(
                         30,
                         "Medium"
                     ),
-
                 difficulty = "Medium",
-
                 completed =
                     isReadingCompleted(
                         context
                     ),
-
                 startTime =
                     getReadingStartTime(
                         context
@@ -423,63 +809,44 @@ object LevelUpData {
         )
     }
 
-
-    // =========================================================
-    // START DEFAULT QUEST
-    // =========================================================
-
     fun startDefaultQuest(
         context: Context,
         questId: Long
     ) {
 
-        val currentTime =
+        val time =
             System.currentTimeMillis()
-
 
         when (questId) {
 
-            1L -> {
-
+            1L ->
                 prefs(context)
                     .edit()
                     .putLong(
                         KEY_STUDY_START_TIME,
-                        currentTime
+                        time
                     )
                     .apply()
-            }
 
-
-            2L -> {
-
+            2L ->
                 prefs(context)
                     .edit()
                     .putLong(
                         KEY_EXERCISE_START_TIME,
-                        currentTime
+                        time
                     )
                     .apply()
-            }
 
-
-            3L -> {
-
+            3L ->
                 prefs(context)
                     .edit()
                     .putLong(
                         KEY_READING_START_TIME,
-                        currentTime
+                        time
                     )
                     .apply()
-            }
         }
     }
-
-
-    // =========================================================
-    // COMPLETE DEFAULT QUEST
-    // =========================================================
 
     fun completeDefaultQuest(
         context: Context,
@@ -487,31 +854,32 @@ object LevelUpData {
         actualSeconds: Long
     ): Int {
 
+        ensureSystemState(
+            context
+        )
+
         val quest =
-            getDefaultQuests(context)
-                .firstOrNull {
-                    it.id == questId
-                }
+            getDefaultQuests(
+                context
+            ).firstOrNull {
+
+                it.id ==
+                        questId
+            }
                 ?: return 0
 
-
-        if (quest.completed) {
+        if (
+            quest.completed
+        ) {
             return 0
         }
 
-
-        val finalXp =
+        val earnedXp =
             calculateFinalXp(
-                baseXp =
-                    quest.baseXp,
-
-                targetMinutes =
-                    quest.targetMinutes,
-
-                actualSeconds =
-                    actualSeconds
+                quest.baseXp,
+                quest.targetMinutes,
+                actualSeconds
             )
-
 
         when (questId) {
 
@@ -527,7 +895,6 @@ object LevelUpData {
                 )
             }
 
-
             2L -> {
 
                 setExerciseCompleted(
@@ -539,7 +906,6 @@ object LevelUpData {
                     context
                 )
             }
-
 
             3L -> {
 
@@ -554,20 +920,17 @@ object LevelUpData {
             }
         }
 
-
         addXp(
             context,
-            finalXp
+            earnedXp
         )
 
+        markActivity(
+            context
+        )
 
-        return finalXp
+        return earnedXp
     }
-
-
-    // =========================================================
-    // DEFAULT QUEST START TIMES
-    // =========================================================
 
     private fun getStudyStartTime(
         context: Context
@@ -580,7 +943,6 @@ object LevelUpData {
             )
     }
 
-
     private fun getExerciseStartTime(
         context: Context
     ): Long {
@@ -592,7 +954,6 @@ object LevelUpData {
             )
     }
 
-
     private fun getReadingStartTime(
         context: Context
     ): Long {
@@ -603,7 +964,6 @@ object LevelUpData {
                 0L
             )
     }
-
 
     private fun clearStudyStartTime(
         context: Context
@@ -617,7 +977,6 @@ object LevelUpData {
             .apply()
     }
 
-
     private fun clearExerciseStartTime(
         context: Context
     ) {
@@ -629,7 +988,6 @@ object LevelUpData {
             )
             .apply()
     }
-
 
     private fun clearReadingStartTime(
         context: Context
@@ -643,180 +1001,18 @@ object LevelUpData {
             .apply()
     }
 
-
-    // =========================================================
-    // GET CUSTOM QUESTS
-    // =========================================================
-
     fun getCustomQuests(
         context: Context
     ): MutableList<Quest> {
 
-        val questList =
-            mutableListOf<Quest>()
+        ensureSystemState(
+            context
+        )
 
-
-        val jsonString =
-            prefs(context)
-                .getString(
-                    KEY_CUSTOM_QUESTS,
-                    "[]"
-                )
-
-
-        try {
-
-            val jsonArray =
-                JSONArray(jsonString)
-
-
-            for (
-            i in 0 until
-                    jsonArray.length()
-            ) {
-
-                val jsonObject =
-                    jsonArray.getJSONObject(i)
-
-
-                val quest =
-                    Quest(
-
-                        id =
-                            jsonObject.optLong(
-                                "id"
-                            ),
-
-                        name =
-                            jsonObject.optString(
-                                "name"
-                            ),
-
-                        targetMinutes =
-                            jsonObject.optInt(
-                                "targetMinutes"
-                            ),
-
-                        baseXp =
-                            jsonObject.optInt(
-                                "baseXp"
-                            ),
-
-                        difficulty =
-                            jsonObject.optString(
-                                "difficulty",
-                                "Medium"
-                            ),
-
-                        completed =
-                            jsonObject.optBoolean(
-                                "completed",
-                                false
-                            ),
-
-                        startTime =
-                            jsonObject.optLong(
-                                "startTime",
-                                0L
-                            )
-                    )
-
-
-                questList.add(
-                    quest
-                )
-            }
-
-        } catch (e: Exception) {
-
-            e.printStackTrace()
-        }
-
-
-        return questList
+        return readCustomQuests(
+            context
+        )
     }
-
-
-    // =========================================================
-    // SAVE CUSTOM QUESTS
-    // =========================================================
-
-    private fun saveCustomQuests(
-        context: Context,
-        quests: List<Quest>
-    ) {
-
-        val jsonArray =
-            JSONArray()
-
-
-        for (quest in quests) {
-
-            val jsonObject =
-                JSONObject()
-
-
-            jsonObject.put(
-                "id",
-                quest.id
-            )
-
-
-            jsonObject.put(
-                "name",
-                quest.name
-            )
-
-
-            jsonObject.put(
-                "targetMinutes",
-                quest.targetMinutes
-            )
-
-
-            jsonObject.put(
-                "baseXp",
-                quest.baseXp
-            )
-
-
-            jsonObject.put(
-                "difficulty",
-                quest.difficulty
-            )
-
-
-            jsonObject.put(
-                "completed",
-                quest.completed
-            )
-
-
-            jsonObject.put(
-                "startTime",
-                quest.startTime
-            )
-
-
-            jsonArray.put(
-                jsonObject
-            )
-        }
-
-
-        prefs(context)
-            .edit()
-            .putString(
-                KEY_CUSTOM_QUESTS,
-                jsonArray.toString()
-            )
-            .apply()
-    }
-
-
-    // =========================================================
-    // ADD CUSTOM QUEST
-    // =========================================================
 
     fun addCustomQuest(
         context: Context,
@@ -825,16 +1021,8 @@ object LevelUpData {
         difficulty: String
     ): Quest {
 
-        val baseXp =
-            calculateBaseXp(
-                targetMinutes,
-                difficulty
-            )
-
-
-        val newQuest =
+        val quest =
             Quest(
-
                 id =
                     System.currentTimeMillis(),
 
@@ -845,7 +1033,10 @@ object LevelUpData {
                     targetMinutes,
 
                 baseXp =
-                    baseXp,
+                    calculateBaseXp(
+                        targetMinutes,
+                        difficulty
+                    ),
 
                 difficulty =
                     difficulty,
@@ -857,31 +1048,22 @@ object LevelUpData {
                     0L
             )
 
-
         val quests =
             getCustomQuests(
                 context
             )
 
-
         quests.add(
-            newQuest
+            quest
         )
-
 
         saveCustomQuests(
             context,
             quests
         )
 
-
-        return newQuest
+        return quest
     }
-
-
-    // =========================================================
-    // UPDATE CUSTOM QUEST
-    // =========================================================
 
     fun updateQuest(
         context: Context,
@@ -893,19 +1075,19 @@ object LevelUpData {
                 context
             )
 
-
         val index =
             quests.indexOfFirst {
+
                 it.id ==
                         updatedQuest.id
             }
 
-
-        if (index != -1) {
+        if (
+            index >= 0
+        ) {
 
             quests[index] =
                 updatedQuest
-
 
             saveCustomQuests(
                 context,
@@ -913,11 +1095,6 @@ object LevelUpData {
             )
         }
     }
-
-
-    // =========================================================
-    // START CUSTOM QUEST
-    // =========================================================
 
     fun startQuest(
         context: Context,
@@ -929,25 +1106,22 @@ object LevelUpData {
                 context
             )
 
-
         val index =
             quests.indexOfFirst {
-                it.id == questId
+
+                it.id ==
+                        questId
             }
 
-
-        if (index != -1) {
-
-            val quest =
-                quests[index]
-
+        if (
+            index >= 0
+        ) {
 
             quests[index] =
-                quest.copy(
+                quests[index].copy(
                     startTime =
                         System.currentTimeMillis()
                 )
-
 
             saveCustomQuests(
                 context,
@@ -956,55 +1130,49 @@ object LevelUpData {
         }
     }
 
-
-    // =========================================================
-    // COMPLETE CUSTOM QUEST
-    // =========================================================
-
     fun completeQuest(
         context: Context,
         questId: Long,
         actualSeconds: Long
     ): Int {
 
+        ensureSystemState(
+            context
+        )
+
         val quests =
             getCustomQuests(
                 context
             )
 
-
         val index =
             quests.indexOfFirst {
-                it.id == questId
+
+                it.id ==
+                        questId
             }
 
-
-        if (index == -1) {
+        if (
+            index < 0
+        ) {
             return 0
         }
-
 
         val quest =
             quests[index]
 
-
-        if (quest.completed) {
+        if (
+            quest.completed
+        ) {
             return 0
         }
 
-
-        val finalXp =
+        val earnedXp =
             calculateFinalXp(
-                baseXp =
-                    quest.baseXp,
-
-                targetMinutes =
-                    quest.targetMinutes,
-
-                actualSeconds =
-                    actualSeconds
+                quest.baseXp,
+                quest.targetMinutes,
+                actualSeconds
             )
-
 
         quests[index] =
             quest.copy(
@@ -1012,26 +1180,22 @@ object LevelUpData {
                 startTime = 0L
             )
 
-
         saveCustomQuests(
             context,
             quests
         )
 
-
         addXp(
             context,
-            finalXp
+            earnedXp
         )
 
+        markActivity(
+            context
+        )
 
-        return finalXp
+        return earnedXp
     }
-
-
-    // =========================================================
-    // STUDY QUEST
-    // =========================================================
 
     fun isStudyCompleted(
         context: Context
@@ -1043,7 +1207,6 @@ object LevelUpData {
                 false
             )
     }
-
 
     fun setStudyCompleted(
         context: Context,
@@ -1059,11 +1222,6 @@ object LevelUpData {
             .apply()
     }
 
-
-    // =========================================================
-    // EXERCISE QUEST
-    // =========================================================
-
     fun isExerciseCompleted(
         context: Context
     ): Boolean {
@@ -1074,7 +1232,6 @@ object LevelUpData {
                 false
             )
     }
-
 
     fun setExerciseCompleted(
         context: Context,
@@ -1090,11 +1247,6 @@ object LevelUpData {
             .apply()
     }
 
-
-    // =========================================================
-    // READING QUEST
-    // =========================================================
-
     fun isReadingCompleted(
         context: Context
     ): Boolean {
@@ -1105,7 +1257,6 @@ object LevelUpData {
                 false
             )
     }
-
 
     fun setReadingCompleted(
         context: Context,
@@ -1121,17 +1272,15 @@ object LevelUpData {
             .apply()
     }
 
-
-    // =========================================================
-    // COMPLETED QUEST COUNT
-    // =========================================================
-
     fun getCompletedQuestCount(
         context: Context
     ): Int {
 
-        var count = 0
+        ensureSystemState(
+            context
+        )
 
+        var count = 0
 
         if (
             isStudyCompleted(
@@ -1141,7 +1290,6 @@ object LevelUpData {
             count++
         }
 
-
         if (
             isExerciseCompleted(
                 context
@@ -1149,7 +1297,6 @@ object LevelUpData {
         ) {
             count++
         }
-
 
         if (
             isReadingCompleted(
@@ -1159,30 +1306,24 @@ object LevelUpData {
             count++
         }
 
-
-        val customQuests =
+        count +=
             getCustomQuests(
                 context
-            )
+            ).count {
 
-
-        count +=
-            customQuests.count {
                 it.completed
             }
-
 
         return count
     }
 
-
-    // =========================================================
-    // STREAK
-    // =========================================================
-
     fun getStreak(
         context: Context
     ): Int {
+
+        ensureSystemState(
+            context
+        )
 
         return prefs(context)
             .getInt(

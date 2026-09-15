@@ -3,6 +3,7 @@ package com.example.levelup
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
+import java.util.Locale
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,35 +18,28 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
-
 class HomeFragment : Fragment() {
 
     private lateinit var questContainer: LinearLayout
-
     private lateinit var levelText: TextView
     private lateinit var xpText: TextView
     private lateinit var xpUntilLevelText: TextView
     private lateinit var xpProgressBar: ProgressBar
 
-    // Running quest timer TextViews
     private val timerViews =
         mutableMapOf<Long, TextView>()
 
-    // Running quest buttons
     private val actionButtons =
         mutableMapOf<Long, Button>()
 
-    // Quest information TextViews
     private val infoViews =
         mutableMapOf<Long, TextView>()
 
-    // Main-thread handler
     private val handler =
         android.os.Handler(
             android.os.Looper.getMainLooper()
         )
 
-    // Updates timers every second
     private val timerRunnable =
         object : Runnable {
 
@@ -64,11 +58,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-
-    // =========================================================
-    // CREATE VIEW
-    // =========================================================
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,11 +70,6 @@ class HomeFragment : Fragment() {
             false
         )
     }
-
-
-    // =========================================================
-    // VIEW CREATED
-    // =========================================================
 
     override fun onViewCreated(
         view: View,
@@ -127,37 +111,24 @@ class HomeFragment : Fragment() {
                 R.id.btnAddQuest
             )
 
-
-        // Show current XP and level
         updateLevelDisplay()
 
-        // Display all quests
         renderAllQuests()
 
-
-        // Add quest button
         addQuestButton.setOnClickListener {
 
             showCreateQuestDialog()
         }
 
-
-        // Start timer updates
         handler.post(
             timerRunnable
         )
     }
 
-
-    // =========================================================
-    // CREATE QUEST DIALOG
-    // =========================================================
-
     private fun showCreateQuestDialog() {
 
         val context =
             requireContext()
-
 
         val layout =
             LinearLayout(context)
@@ -171,11 +142,6 @@ class HomeFragment : Fragment() {
             50,
             10
         )
-
-
-        // =====================================================
-        // QUEST NAME
-        // =====================================================
 
         val questNameInput =
             EditText(context)
@@ -191,11 +157,6 @@ class HomeFragment : Fragment() {
             questNameInput,
             fieldParams()
         )
-
-
-        // =====================================================
-        // TARGET TIME
-        // =====================================================
 
         val targetTimeInput =
             EditText(context)
@@ -214,11 +175,6 @@ class HomeFragment : Fragment() {
             targetTimeInput,
             fieldParams()
         )
-
-
-        // =====================================================
-        // DIFFICULTY
-        // =====================================================
 
         val difficultyLabel =
             TextView(context)
@@ -247,7 +203,6 @@ class HomeFragment : Fragment() {
             difficultyLabel
         )
 
-
         val difficultySpinner =
             Spinner(context)
 
@@ -268,7 +223,6 @@ class HomeFragment : Fragment() {
         difficultySpinner.adapter =
             adapter
 
-        // Medium selected by default
         difficultySpinner.setSelection(
             1
         )
@@ -277,11 +231,6 @@ class HomeFragment : Fragment() {
             difficultySpinner,
             fieldParams()
         )
-
-
-        // =====================================================
-        // INFORMATION
-        // =====================================================
 
         val information =
             TextView(context)
@@ -310,11 +259,6 @@ class HomeFragment : Fragment() {
             information
         )
 
-
-        // =====================================================
-        // DIALOG
-        // =====================================================
-
         val dialog =
             AlertDialog.Builder(context)
                 .setTitle(
@@ -334,14 +278,12 @@ class HomeFragment : Fragment() {
                 )
                 .create()
 
-
         dialog.setOnShowListener {
 
             val createButton =
                 dialog.getButton(
                     AlertDialog.BUTTON_POSITIVE
                 )
-
 
             createButton.setOnClickListener {
 
@@ -350,18 +292,14 @@ class HomeFragment : Fragment() {
                         .toString()
                         .trim()
 
-
                 val targetText =
                     targetTimeInput.text
                         .toString()
                         .trim()
 
-
-                // =================================================
-                // VALIDATE NAME
-                // =================================================
-
-                if (questName.isEmpty()) {
+                if (
+                    questName.isEmpty()
+                ) {
 
                     questNameInput.error =
                         "Enter a quest name"
@@ -369,12 +307,9 @@ class HomeFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-
-                // =================================================
-                // VALIDATE TARGET TIME
-                // =================================================
-
-                if (targetText.isEmpty()) {
+                if (
+                    targetText.isEmpty()
+                ) {
 
                     targetTimeInput.error =
                         "Enter target time"
@@ -382,10 +317,8 @@ class HomeFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-
                 val targetMinutes =
                     targetText.toIntOrNull()
-
 
                 if (
                     targetMinutes == null ||
@@ -398,8 +331,9 @@ class HomeFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-
-                if (targetMinutes > 1440) {
+                if (
+                    targetMinutes > 1440
+                ) {
 
                     targetTimeInput.error =
                         "Maximum is 1440 minutes"
@@ -407,20 +341,10 @@ class HomeFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-
-                // =================================================
-                // GET DIFFICULTY
-                // =================================================
-
                 val difficulty =
                     difficultySpinner
                         .selectedItem
                         .toString()
-
-
-                // =================================================
-                // SAVE QUEST
-                // =================================================
 
                 val newQuest =
                     LevelUpData.addCustomQuest(
@@ -430,17 +354,9 @@ class HomeFragment : Fragment() {
                         difficulty
                     )
 
-
                 dialog.dismiss()
 
-
-                // Refresh Home screen
                 renderAllQuests()
-
-
-                // =================================================
-                // CONFIRMATION
-                // =================================================
 
                 AlertDialog.Builder(context)
                     .setTitle(
@@ -460,76 +376,56 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         dialog.show()
     }
 
-
-    // =========================================================
-    // RENDER ALL QUESTS
-    // =========================================================
-
     private fun renderAllQuests() {
 
-        if (!::questContainer.isInitialized) {
+        if (
+            !::questContainer.isInitialized
+        ) {
             return
         }
 
-
         questContainer.removeAllViews()
-
 
         timerViews.clear()
         actionButtons.clear()
         infoViews.clear()
 
-
         val context =
             requireContext()
-
-
-        // =====================================================
-        // DEFAULT QUESTS
-        // =====================================================
 
         val defaultQuests =
             LevelUpData.getDefaultQuests(
                 context
             )
 
-
-        for (quest in defaultQuests) {
+        for (
+        quest in defaultQuests
+        ) {
 
             addQuestCard(
-                quest = quest,
-                isDefault = true
+                quest,
+                true
             )
         }
-
-
-        // =====================================================
-        // CUSTOM QUESTS
-        // =====================================================
 
         val customQuests =
             LevelUpData.getCustomQuests(
                 context
             )
 
-
-        for (quest in customQuests) {
+        for (
+        quest in customQuests
+        ) {
 
             addQuestCard(
-                quest = quest,
-                isDefault = false
+                quest,
+                false
             )
         }
     }
-
-
-    // =========================================================
-    // ADD QUEST CARD
-    // =========================================================
 
     private fun addQuestCard(
         quest: LevelUpData.Quest,
@@ -539,16 +435,10 @@ class HomeFragment : Fragment() {
         val context =
             requireContext()
 
-
-        // =====================================================
-        // CARD
-        // =====================================================
-
         val card =
             androidx.cardview.widget.CardView(
                 context
             )
-
 
         val cardParams =
             LinearLayout.LayoutParams(
@@ -556,22 +446,17 @@ class HomeFragment : Fragment() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
 
-
         cardParams.bottomMargin =
             8.dp()
-
 
         card.layoutParams =
             cardParams
 
-
         card.radius =
             18.dp().toFloat()
 
-
         card.cardElevation =
             0f
-
 
         card.setCardBackgroundColor(
             ContextCompat.getColor(
@@ -579,11 +464,6 @@ class HomeFragment : Fragment() {
                 R.color.levelup_surface
             )
         )
-
-
-        // =====================================================
-        // MAIN LAYOUT
-        // =====================================================
 
         val mainLayout =
             LinearLayout(context)
@@ -598,11 +478,6 @@ class HomeFragment : Fragment() {
             14.dp()
         )
 
-
-        // =====================================================
-        // TOP ROW
-        // =====================================================
-
         val topRow =
             LinearLayout(context)
 
@@ -612,14 +487,13 @@ class HomeFragment : Fragment() {
         topRow.gravity =
             Gravity.CENTER_VERTICAL
 
-
-        // QUEST NAME
-
         val nameText =
             TextView(context)
 
         nameText.text =
-            if (quest.completed) {
+            if (
+                quest.completed
+            ) {
                 "✓  ${quest.name}"
             } else {
                 quest.name
@@ -640,7 +514,6 @@ class HomeFragment : Fragment() {
             )
         )
 
-
         val nameParams =
             LinearLayout.LayoutParams(
                 0,
@@ -648,14 +521,10 @@ class HomeFragment : Fragment() {
                 1f
             )
 
-
         topRow.addView(
             nameText,
             nameParams
         )
-
-
-        // XP
 
         val xpRewardText =
             TextView(context)
@@ -678,20 +547,13 @@ class HomeFragment : Fragment() {
             )
         )
 
-
         topRow.addView(
             xpRewardText
         )
 
-
         mainLayout.addView(
             topRow
         )
-
-
-        // =====================================================
-        // INFORMATION
-        // =====================================================
 
         val infoText =
             TextView(context)
@@ -709,7 +571,6 @@ class HomeFragment : Fragment() {
             )
         )
 
-
         val infoParams =
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -719,22 +580,19 @@ class HomeFragment : Fragment() {
         infoParams.topMargin =
             5.dp()
 
-
         mainLayout.addView(
             infoText,
             infoParams
         )
 
-
-        infoViews[quest.id] =
+        infoViews[
+            quest.id
+        ] =
             infoText
 
-
-        // =====================================================
-        // COMPLETED QUEST
-        // =====================================================
-
-        if (quest.completed) {
+        if (
+            quest.completed
+        ) {
 
             card.addView(
                 mainLayout
@@ -747,20 +605,15 @@ class HomeFragment : Fragment() {
             return
         }
 
-
-        // =====================================================
-        // ACTION BUTTON
-        // =====================================================
-
         val actionButton =
             Button(context)
 
-
-        val isRunning =
+        val running =
             quest.startTime > 0L
 
-
-        if (isRunning) {
+        if (
+            running
+        ) {
 
             val elapsed =
                 formatElapsedTime(
@@ -775,7 +628,6 @@ class HomeFragment : Fragment() {
             actionButton.text =
                 "▶  START QUEST"
         }
-
 
         actionButton.textSize =
             12f
@@ -798,7 +650,6 @@ class HomeFragment : Fragment() {
                 R.color.levelup_primary
             )
 
-
         val buttonParams =
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -808,20 +659,15 @@ class HomeFragment : Fragment() {
         buttonParams.topMargin =
             10.dp()
 
-
         mainLayout.addView(
             actionButton,
             buttonParams
         )
 
-
-        actionButtons[quest.id] =
+        actionButtons[
+            quest.id
+        ] =
             actionButton
-
-
-        // =====================================================
-        // TIMER
-        // =====================================================
 
         val timerText =
             TextView(context)
@@ -839,18 +685,21 @@ class HomeFragment : Fragment() {
             )
         )
 
+        timerText.text =
+            if (
+                running
+            ) {
 
-        if (isRunning) {
+                "Elapsed: ${
+                    formatElapsedTime(
+                        quest.startTime
+                    )
+                }"
 
-            timerText.text =
-                "Elapsed: ${formatElapsedTime(quest.startTime)}"
+            } else {
 
-        } else {
-
-            timerText.text =
                 "Ready to start"
-        }
-
+            }
 
         val timerParams =
             LinearLayout.LayoutParams(
@@ -861,24 +710,21 @@ class HomeFragment : Fragment() {
         timerParams.topMargin =
             5.dp()
 
-
         mainLayout.addView(
             timerText,
             timerParams
         )
 
-
-        timerViews[quest.id] =
+        timerViews[
+            quest.id
+        ] =
             timerText
-
-
-        // =====================================================
-        // BUTTON CLICK
-        // =====================================================
 
         actionButton.setOnClickListener {
 
-            if (quest.startTime > 0L) {
+            if (
+                quest.startTime > 0L
+            ) {
 
                 completeQuest(
                     quest
@@ -893,21 +739,14 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         card.addView(
             mainLayout
         )
-
 
         questContainer.addView(
             card
         )
     }
-
-
-    // =========================================================
-    // START QUEST
-    // =========================================================
 
     private fun startQuest(
         quest: LevelUpData.Quest,
@@ -917,8 +756,9 @@ class HomeFragment : Fragment() {
         val context =
             requireContext()
 
-
-        if (isDefault) {
+        if (
+            isDefault
+        ) {
 
             LevelUpData.startDefaultQuest(
                 context,
@@ -933,14 +773,8 @@ class HomeFragment : Fragment() {
             )
         }
 
-
         renderAllQuests()
     }
-
-
-    // =========================================================
-    // COMPLETE QUEST
-    // =========================================================
 
     private fun completeQuest(
         quest: LevelUpData.Quest
@@ -949,31 +783,24 @@ class HomeFragment : Fragment() {
         val context =
             requireContext()
 
-
-        // Calculate elapsed minutes
-        val actualMinutes =
-            getElapsedMinutes(
+        val actualSeconds =
+            getElapsedSeconds(
                 quest.startTime
             )
 
+        val actualMinutes =
+            (
+                    actualSeconds / 60L
+                    )
+                .toInt()
+                .coerceAtLeast(1)
 
-        // Calculate preview XP
         val finalXp =
             LevelUpData.calculateFinalXp(
-                baseXp =
-                    quest.baseXp,
-
-                targetMinutes =
-                    quest.targetMinutes,
-
-                actualMinutes =
-                    actualMinutes
+                quest.baseXp,
+                quest.targetMinutes,
+                actualSeconds
             )
-
-
-        // =====================================================
-        // CONFIRMATION DIALOG
-        // =====================================================
 
         AlertDialog.Builder(context)
             .setTitle(
@@ -993,53 +820,29 @@ class HomeFragment : Fragment() {
                 "COMPLETE"
             ) { _, _ ->
 
+                val earnedXp =
+                    if (
+                        quest.id <= 3L
+                    ) {
 
-                val earnedXp: Int
-
-
-                // =================================================
-                // DEFAULT QUEST
-                // =================================================
-
-                if (quest.id <= 3L) {
-
-                    earnedXp =
                         LevelUpData.completeDefaultQuest(
-                            context = context,
-                            questId = quest.id,
-                            actualSeconds =
-                                actualMinutes * 60L
+                            context,
+                            quest.id,
+                            actualSeconds
                         )
 
-                }
+                    } else {
 
-
-                // =================================================
-                // CUSTOM QUEST
-                // =================================================
-
-                else {
-
-                    earnedXp =
                         LevelUpData.completeQuest(
-                            context = context,
-                            questId = quest.id,
-                            actualSeconds =
-                                actualMinutes * 60L
+                            context,
+                            quest.id,
+                            actualSeconds
                         )
-                }
+                    }
 
-
-                // Update XP and level
                 updateLevelDisplay()
 
-                // Refresh quest list
                 renderAllQuests()
-
-
-                // =================================================
-                // SUCCESS MESSAGE
-                // =================================================
 
                 AlertDialog.Builder(context)
                     .setTitle(
@@ -1061,91 +864,70 @@ class HomeFragment : Fragment() {
             .show()
     }
 
-
-    // =========================================================
-    // UPDATE LEVEL DISPLAY
-    // =========================================================
-
     private fun updateLevelDisplay() {
 
-        if (!::levelText.isInitialized) {
+        if (
+            !::levelText.isInitialized
+        ) {
             return
         }
 
-
         val context =
             requireContext()
-
 
         val level =
             LevelUpData.getLevel(
                 context
             )
 
-
         val currentXp =
             LevelUpData.getCurrentLevelXp(
                 context
             )
-
 
         val xpToNext =
             LevelUpData.getXpToNextLevel(
                 context
             )
 
-
         val xpPerLevel =
             LevelUpData.getXpPerLevel()
-
 
         levelText.text =
             "LEVEL $level"
 
-
         xpText.text =
             "$currentXp / $xpPerLevel XP"
-
 
         xpUntilLevelText.text =
             "$xpToNext XP until Level ${level + 1}"
 
-
         xpProgressBar.max =
             xpPerLevel
-
 
         xpProgressBar.progress =
             currentXp
     }
 
-
-    // =========================================================
-    // UPDATE RUNNING TIMERS
-    // =========================================================
-
     private fun updateRunningTimers() {
 
-        if (!::questContainer.isInitialized) {
+        if (
+            !::questContainer.isInitialized
+        ) {
             return
         }
 
-
         val context =
             requireContext()
-
-
-        // =====================================================
-        // DEFAULT QUESTS
-        // =====================================================
 
         val defaultQuests =
             LevelUpData.getDefaultQuests(
                 context
             )
 
-
-        for (quest in defaultQuests) {
+        for (
+        quest in defaultQuests
+        ) {
 
             if (
                 !quest.completed &&
@@ -1158,18 +940,14 @@ class HomeFragment : Fragment() {
             }
         }
 
-
-        // =====================================================
-        // CUSTOM QUESTS
-        // =====================================================
-
         val customQuests =
             LevelUpData.getCustomQuests(
                 context
             )
 
-
-        for (quest in customQuests) {
+        for (
+        quest in customQuests
+        ) {
 
             if (
                 !quest.completed &&
@@ -1182,11 +960,6 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
-
-    // =========================================================
-    // UPDATE ONE TIMER
-    // =========================================================
 
     private fun updateTimerUI(
         quest: LevelUpData.Quest
@@ -1197,101 +970,66 @@ class HomeFragment : Fragment() {
                 quest.startTime
             )
 
-
         timerViews[
             quest.id
         ]?.text =
             "Elapsed: $elapsed"
-
 
         actionButtons[
             quest.id
         ]?.text =
             "COMPLETE  •  $elapsed"
 
-
         infoViews[
             quest.id
         ]?.text =
-            "${quest.targetMinutes} min  •  " +
-                    "${quest.difficulty}"
+            "${quest.targetMinutes} min  •  ${quest.difficulty}"
     }
 
-
-    // =========================================================
-    // GET ELAPSED MINUTES
-    // =========================================================
-
-    private fun getElapsedMinutes(
+    private fun getElapsedSeconds(
         startTime: Long
-    ): Int {
+    ): Long {
 
-        if (startTime <= 0L) {
-            return 0
+        if (
+            startTime <= 0L
+        ) {
+            return 0L
         }
 
-
-        val elapsedMillis =
-            System.currentTimeMillis() -
-                    startTime
-
-
-        val minutes =
-            elapsedMillis /
-                    (60 * 1000)
-
-
-        /*
-         * At least 1 minute is counted.
-         * This prevents a quest completed
-         * immediately from getting an
-         * unrealistic 0-minute value.
-         */
-
-        return minutes
-            .toInt()
-            .coerceAtLeast(1)
+        return (
+                System.currentTimeMillis() -
+                        startTime
+                )
+            .coerceAtLeast(0L) /
+                1000L
     }
-
-
-    // =========================================================
-    // FORMAT TIMER
-    // =========================================================
 
     private fun formatElapsedTime(
         startTime: Long
     ): String {
 
-        if (startTime <= 0L) {
-            return "00:00"
-        }
-
-
-        val elapsedMillis =
-            System.currentTimeMillis() -
-                    startTime
-
-
         val totalSeconds =
-            (elapsedMillis / 1000)
-                .coerceAtLeast(0)
-
+            getElapsedSeconds(
+                startTime
+            )
 
         val hours =
-            totalSeconds / 3600
-
+            totalSeconds / 3600L
 
         val minutes =
-            (totalSeconds % 3600) / 60
-
+            (
+                    totalSeconds % 3600L
+                    ) / 60L
 
         val seconds =
-            totalSeconds % 60
+            totalSeconds % 60L
 
-
-        return if (hours > 0) {
+        return if (
+            hours > 0L
+        ) {
 
             String.format(
+                Locale.getDefault(),
                 "%02d:%02d:%02d",
                 hours,
                 minutes,
@@ -1301,17 +1039,13 @@ class HomeFragment : Fragment() {
         } else {
 
             String.format(
+                Locale.getDefault(),
                 "%02d:%02d",
                 minutes,
                 seconds
             )
         }
     }
-
-
-    // =========================================================
-    // DIALOG FIELD PARAMETERS
-    // =========================================================
 
     private fun fieldParams():
             LinearLayout.LayoutParams {
@@ -1322,18 +1056,11 @@ class HomeFragment : Fragment() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
 
-
         params.topMargin =
             8.dp()
 
-
         return params
     }
-
-
-    // =========================================================
-    // DP HELPER
-    // =========================================================
 
     private fun Int.dp(): Int {
 
@@ -1343,22 +1070,15 @@ class HomeFragment : Fragment() {
                 ).toInt()
     }
 
-
-    // =========================================================
-    // DESTROY VIEW
-    // =========================================================
-
     override fun onDestroyView() {
 
         handler.removeCallbacks(
             timerRunnable
         )
 
-
         timerViews.clear()
         actionButtons.clear()
         infoViews.clear()
-
 
         super.onDestroyView()
     }
