@@ -39,9 +39,41 @@ The application contains four main sections:
 - **Compile SDK:** 37
 - **Java:** 11
 
+## 📸 Output Screenshots
+
+### 🏠 Home Screen
+
+![Home Screen](home.png)
+
+---
+
+### ➕ Create Custom Quest / Home Screen
+
+![Home Screen 2](home2.png)
+
+---
+
+### 📊 Stats Screen
+
+![Stats Screen](stats.png)
+
+---
+
+### 🏆 Achievements Screen
+
+![Achievements Screen](achievements.png)
+
+---
+
+### 👤 Profile Screen
+
+![Profile Screen](profile.png)
+
+---
+
 ## Project Structure
 
-```text
+
 LevelUp/
 │
 ├── app/
@@ -73,4 +105,11 @@ LevelUp/
 ├── build.gradle.kts
 ├── settings.gradle.kts
 ├── gradle.properties
+│
+├── achievements.png
+├── home.png
+├── home2.png
+├── profile.png
+├── stats.png
+│
 └── README.md
