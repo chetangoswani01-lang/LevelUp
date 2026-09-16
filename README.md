@@ -21,9 +21,6 @@ LevelUp is an Android productivity and habit-tracking application that turns dai
 The application contains four main sections:
 
 - **Home** – View and complete quests and create custom quests.
-  <img width="356" height="771" alt="image" src="https://github.com/user-attachments/assets/7423c670-e576-4d45-b73f-7b02313b8cdb" />
-
-  
 - **Stats** – View productivity and progression statistics.
 - **Achievements** – View unlocked and locked achievements.
 - **Profile** – View the user's level, XP, and streak.
